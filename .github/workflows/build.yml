@@ -1,16 +1,30 @@
 name: Build
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
       - master
+      - jg/build-cmake
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run build
+      - name: Install CMake
         run: |
-          ./build
+          sudo apt-get install -y cmake
+
+      - name: Configure
+        run: |
+          cmake -S . -B build-wiringpi
+
+      - name: Build
+        run: |
+          cmake --build build-wiringpi
+
+      - name: Install
+        run: |
+          sudo cmake --build build-wiringpi --target install --prefix /usr
